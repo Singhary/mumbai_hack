@@ -1,15 +1,16 @@
 "use client"
 
 import { IEvent } from '@/lib/database/models/event.model'
-import { SignedIn, SignedOut, useUser } from '@clerk/nextjs'
+import { SignedIn, SignedOut, useAuth, useUser } from '@clerk/nextjs'
 import Link from 'next/link'
 import React from 'react'
 import { Button } from '../ui/button'
 import Checkout from './Checkout'
 
 const CheckoutButton = ({ event }: { event: IEvent }) => {
-  const { user } = useUser();
-  const userId = user?.publicMetadata.userId as string;
+  const { userId } = useAuth();
+  console.log('CheckOutButton_User_Id_check', userId);
+  // const userId = user?.publicMetadata.userId as string;
   const hasEventFinished = new Date(event.endDateTime) < new Date();
 
   return (
@@ -27,7 +28,7 @@ const CheckoutButton = ({ event }: { event: IEvent }) => {
           </SignedOut>
 
           <SignedIn>
-            <Checkout event={event} userId={userId} />
+            <Checkout event={event} userId={userId!} />
           </SignedIn>
         </>
       )}
