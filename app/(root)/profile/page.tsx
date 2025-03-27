@@ -22,7 +22,7 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
 
   const orderedEvents = orders?.data.map((order: IOrder) => order.event) || [];
   const organizedEvents = await getEventsByUser({ userId, page: eventsPage });
-  console.log(organizedEvents);
+  console.log('orderedEvents', orderedEvents);
 
   return (
     <>
@@ -63,7 +63,7 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
         </div>
       </section>
 
-      {/* <section className="wrapper my-8">
+      <section className="wrapper my-8">
         <Collection 
           data={organizedEvents?.data}
           emptyTitle="No events have been created yet"
@@ -74,7 +74,7 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
           urlParamName="eventsPage"
           totalPages={organizedEvents?.totalPages}
         />
-      </section> */}
+      </section>
     </>
   )
 }
