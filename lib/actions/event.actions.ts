@@ -143,7 +143,7 @@ export async function getAllEvents({ query, limit = 6, page, category }: GetAllE
 export async function getEventsByUser({ userId, limit = 6, page }: GetEventsByUserParams) {
   try {
     await connectToDatabase();
-
+    console.log('getEventByUser_user_id', userId);
     // Fetch MongoDB ObjectId for user
     const organizer = await User.findOne({ clerkId: String(userId) });
     if (!organizer) throw new Error('Organizer not found');

@@ -9,8 +9,6 @@ import Checkout from './Checkout'
 
 const CheckoutButton = ({ event }: { event: IEvent }) => {
   const { userId } = useAuth();
-  console.log('CheckOutButton_User_Id_check', userId);
-  // const userId = user?.publicMetadata.userId as string;
   const hasEventFinished = new Date(event.endDateTime) < new Date();
 
   return (

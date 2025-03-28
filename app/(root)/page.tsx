@@ -1,4 +1,5 @@
 import CategoryFilter from '@/components/shared/CategoryFilter';
+import Chatbot from '@/components/shared/Chatbot';
 import Collection from '@/components/shared/Collection'
 import Search from '@/components/shared/Search';
 import { Button } from '@/components/ui/button'
@@ -61,6 +62,8 @@ export default async function Home({ searchParams }: SearchParamProps) {
           totalPages={events?.totalPages}
         />
       </section>
+
+      <Chatbot/>
     </>
   )
 }
