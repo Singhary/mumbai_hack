@@ -5,6 +5,7 @@ import Search from '@/components/shared/Search';
 import { Button } from '@/components/ui/button'
 import { getAllEvents } from '@/lib/actions/event.actions';
 import { SearchParamProps } from '@/types';
+import { auth } from '@clerk/nextjs';
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -12,6 +13,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
   const page = Number(searchParams?.page) || 1;
   const searchText = (searchParams?.query as string) || '';
   const category = (searchParams?.category as string) || '';
+  const {userId}= auth()
 
   const events = await getAllEvents({
     query: searchText,
@@ -63,7 +65,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
         />
       </section>
 
-      <Chatbot/>
+      <Chatbot userId={userId!}/>
     </>
   )
 }

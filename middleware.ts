@@ -6,12 +6,18 @@ export default authMiddleware({
     '/events/:id',
     '/api/webhooks/clerk',
     '/api/webhooks/stripe',
-    '/api/uploadthing'
+    '/api/uploadthing',
+    '/api/chatbot/events',
+    '/api/chatbot/checkout',
+    '/api/chatbot/gemini',
   ],
   ignoredRoutes: [
     '/api/webhooks/clerk',
     '/api/webhooks/stripe',
-    '/api/uploadthing'
+    '/api/uploadthing',
+    '/api/chatbot/events',
+    '/api/chatbot/checkout',
+    '/api/chatbot/gemini',
   ]
 });
  

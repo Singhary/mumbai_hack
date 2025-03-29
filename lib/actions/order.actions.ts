@@ -43,7 +43,7 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
       ],
       metadata: {
         eventId: order.eventId,
-        buyerId: user._id.toString(), 
+        buyerId: order.buyerId, 
       },
       mode: "payment",
       success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
