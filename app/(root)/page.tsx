@@ -8,8 +8,10 @@ import { SearchParamProps } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import Chatbot from '@/components/shared/Chatbot'; // Add this import
+import { auth } from '@clerk/nextjs';
 
 export default async function Home({ searchParams }: SearchParamProps) {
+  const {userId} = auth()
   const page = Number(searchParams?.page) || 1;
   const searchText = (searchParams?.query as string) || '';
   const category = (searchParams?.category as string) || '';
@@ -46,7 +48,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
       </section> 
 
       <section id="events" className="wrapper my-8 flex flex-col gap-8 md:gap-12">
-        <h2 className="h2-bold">Event Details <br /></h2>
+        <h2 className="h2-bold">Event Details </h2>
 
         <div className="flex w-full flex-col gap-5 md:flex-row">
           <Search />
@@ -64,7 +66,7 @@ export default async function Home({ searchParams }: SearchParamProps) {
         />
       </section>
 
-      <Chatbot /> {/* Add this line */}
+      <Chatbot userId={userId!} /> {/* Add this line */}
     </>
   );
 }

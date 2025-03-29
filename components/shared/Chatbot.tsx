@@ -153,7 +153,18 @@ const Chatbot = ({ userId }: ChatbotProps) => {
           <p><strong>Location:</strong> {event.location || 'Not specified'}</p>
           <p><strong>Description:</strong> {event.description || 'No description available'}</p>
           <p><strong>Price:</strong> {event.isFree ? 'Free' : event.price || 'Not specified'}</p>
-          {event.url && <p><strong>URL:</strong> <a href={event.url} target="_blank" className="text-blue-500 underline">{event.url}</a></p>}
+          {event.url && (
+            <p>
+              <strong>URL:</strong>{' '}
+              <a
+                href={event.url}
+                target="_blank"
+                className="text-blue-500 underline break-all max-w-full inline-block"
+              >
+                {event.url}
+              </a>
+            </p>
+          )}
           <p><strong>Category:</strong> {event.category?.name || 'Not specified'}</p>
           <p><strong>Organizer:</strong> {event.organizer ? `${event.organizer.firstName} ${event.organizer.lastName}` : 'Not specified'}</p>
         </div>
