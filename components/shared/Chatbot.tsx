@@ -36,12 +36,12 @@ const Chatbot = ({ userId }: ChatbotProps) => {
   };
 
   const initialSuggestedQuestions = [
-    { display: "What metrics should I track?", action: "what metrics should i track?" },
+    // { display: "", action: "what metrics should i track?" },
     { display: "Provide event highlights", action: "provide event highlights" },
     { display: "Display all events", action: "display all events" },
     { display: "Summarize an event", action: "summarize an event" },
     { display: "Perform sentiment analysis for an event", action: "perform sentiment analysis for an event" },
-    { display: "Generate a poster for an event", action: "generate a poster for an event" }
+    // { display: "Generate a poster for an event", action: "generate a poster for an event" }
   ];
 
   useEffect(() => {

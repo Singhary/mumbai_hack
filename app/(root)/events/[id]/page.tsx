@@ -8,11 +8,12 @@ import Image from 'next/image';
 // Explicitly type the props with SearchParamProps
 const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
   const event = await getEventById(params.id);
+  const resolvedSearchParams = await searchParams;
 
   const relatedEvents = await getRelatedEventsByCategory({
     categoryId: event.category._id,
     eventId: event._id,
-    page: searchParams.page as string,
+    page: resolvedSearchParams.page as string,
   });
 
   return (
@@ -90,7 +91,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
           emptyStateSubtext="Come back later"
           collectionType="All_Events"
           limit={3}
-          page={searchParams.page as string}
+          page={(await searchParams).page as string}
           totalPages={relatedEvents?.totalPages}
         />
       </section>
