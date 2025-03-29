@@ -23,7 +23,6 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
   try {
     await connectToDatabase();
     
-    // Convert Clerk ID to MongoDB ID
     const user = await User.findOne({ clerkId: order.buyerId });
     if (!user) {
       throw new Error("User not found");
@@ -44,7 +43,7 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
       ],
       metadata: {
         eventId: order.eventId,
-        buyerId: user._id.toString(), // Use MongoDB _id instead of Clerk ID
+        buyerId: user._id.toString(), 
       },
       mode: "payment",
       success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
