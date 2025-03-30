@@ -1,5 +1,6 @@
 import EventForm from "@/components/shared/EventForm"
 import { auth } from "@clerk/nextjs";
+import Chatbot from "@/components/shared/Chatbot"
 
 const CreateEvent = () => {
   const{userId} = auth()
@@ -13,6 +14,7 @@ const CreateEvent = () => {
       <div className="wrapper my-8">
         <EventForm userId={userId!} type="Create" />
       </div>
+      <Chatbot userId={userId!}/>
     </>
   )
 }
