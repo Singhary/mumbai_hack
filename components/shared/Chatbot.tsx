@@ -6,7 +6,7 @@ import { checkoutOrder } from "@/lib/actions/order.actions";
 
 interface Message {
   type: "user" | "bot";
-  content: string | JSX.Element; // Updated to support JSX
+  content: string | JSX.Element;
   isRich?: boolean;
 }
 
@@ -40,12 +40,9 @@ const Chatbot = ({ userId }: ChatbotProps) => {
   };
 
   const initialSuggestedQuestions = [
-    // { display: "", action: "what metrics should i track?" },
     { display: "Provide event highlights", action: "provide event highlights" },
     { display: "Display all events", action: "display all events" },
     { display: "Summarize an event", action: "summarize an event" },
-    // { display: "Perform sentiment analysis for an event", action: "perform sentiment analysis for an event" },
-    // { display: "Generate a poster for an event", action: "generate a poster for an event" }
   ];
 
   useEffect(() => {
@@ -75,7 +72,7 @@ const Chatbot = ({ userId }: ChatbotProps) => {
         ${options
           .map(
             (opt) =>
-              `<button class="px-2 py-1 bg-gray-200 rounded hover:bg-blue-500 hover:text-white" onclick="window.dispatchEvent(new CustomEvent('sendMessage', { detail: '${opt.action}' }))">${opt.display}</button>`
+              `<button class="px-3 py-1 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 shadow-md" onclick="window.dispatchEvent(new CustomEvent('sendMessage', { detail: '${opt.action}' }))">${opt.display}</button>`
           )
           .join("")}
       </div>
@@ -86,13 +83,15 @@ const Chatbot = ({ userId }: ChatbotProps) => {
   const fetchAllEvents = async () => {
     try {
       const response = await fetch("/api/chatbot/events", {
+        method: "GET",
         headers: { "Content-Type": "application/json" },
       });
       if (!response.ok) throw new Error("Failed to fetch events");
-      return await response.json();
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error("Fetch all events error:", error);
-      return null;
+      return [];
     }
   };
 
@@ -139,12 +138,9 @@ const Chatbot = ({ userId }: ChatbotProps) => {
       buyerId: userId,
     };
     console.log("Order data:", order);
-    console.log("User ID:", userId);
-    console.log("buyerId:", order.buyerId);
     try {
-      checkoutOrder(order).then((response) => {
-        console.log("Checkout response:", response);
-      });
+      const response = await checkoutOrder(order);
+      console.log("Checkout response:", response);
     } catch (error) {
       console.error("Checkout error:", error);
     }
@@ -153,61 +149,63 @@ const Chatbot = ({ userId }: ChatbotProps) => {
   const displayEventDetails = (event: any) => {
     const eventDetails = (
       <div>
-        <h4 className="text-lg font-semibold">{event.title}</h4>
-        <div className="mt-2">
-          <p>
-            <strong>Date:</strong>{" "}
+        <h4 className="text-xl font-bold text-indigo-600">{event.title}</h4>
+        <div className="mt-3 bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p className="text-sm">
+            <strong className="text-gray-700">Date:</strong>{" "}
             {new Date(event.startDateTime).toLocaleString()} -{" "}
             {new Date(event.endDateTime).toLocaleString()}
           </p>
-          <p>
-            <strong>Location:</strong> {event.location || "Not specified"}
+          <p className="text-sm">
+            <strong className="text-gray-700">Location:</strong>{" "}
+            {event.location || "Not specified"}
           </p>
-          <p>
-            <strong>Description:</strong>{" "}
+          <p className="text-sm">
+            <strong className="text-gray-700">Description:</strong>{" "}
             {event.description || "No description available"}
           </p>
-          <p>
-            <strong>Price:</strong>{" "}
+          <p className="text-sm">
+            <strong className="text-gray-700">Price:</strong>{" "}
             {event.isFree ? "Free" : event.price || "Not specified"}
           </p>
           {event.url && (
-            <p>
-              <strong>URL:</strong>{" "}
+            <p className="text-sm">
+              <strong className="text-gray-700">URL:</strong>{" "}
               <a
                 href={event.url}
                 target="_blank"
-                className="text-blue-500 underline break-all max-w-full inline-block"
+                className="text-indigo-500 hover:underline break-all max-w-full inline-block"
               >
                 {event.url}
               </a>
             </p>
           )}
-          <p>
-            <strong>Category:</strong> {event.category?.name || "Not specified"}
+          <p className="text-sm">
+            <strong className="text-gray-700">Category:</strong>{" "}
+            {event.category?.name || "Not specified"}
           </p>
-          <p>
-            <strong>Organizer:</strong>{" "}
+          <p className="text-sm">
+            <strong className="text-gray-700">Organizer:</strong>{" "}
             {event.organizer
               ? `${event.organizer.firstName} ${event.organizer.lastName}`
               : "Not specified"}
           </p>
         </div>
-        <div className="mt-2">
-          <h5 className="text-md font-medium">Event Image</h5>
-          <div className="flex gap-2 flex-wrap">
+        <div className="mt-4">
+          <h5 className="text-md font-semibold text-gray-800">Event Image</h5>
+          <div className="flex gap-3 flex-wrap mt-2">
             <div>
               <img
                 src={event.imageUrl}
                 alt={event.title}
-                className="w-24 h-24 object-cover cursor-pointer"
+                className="w-28 h-28 object-cover rounded-md shadow-md cursor-pointer hover:scale-105 transition-transform duration-300"
                 onClick={() => {
                   const lightbox = document.createElement("div");
                   lightbox.className =
-                    "fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50";
+                    "fixed inset-0 bg-black bg-opacity-85 flex justify-center items-center z-50";
                   lightbox.innerHTML = `
-                    <div class="absolute top-5 right-5 text-white text-2xl cursor-pointer" onclick="this.parentElement.remove()">×</div>
-                    <img src="${event.imageUrl}" alt="Enlarged event photo" class="max-w-[90%] max-h-[90%]">
+                    <div class="absolute top-5 right-5 text-white text-3xl cursor-pointer hover:text-gray-300 transition-colors" onclick="this.parentElement.remove()">×</div>
+                    <img src="${event.imageUrl}" alt="Enlarged event photo" class="max-w-[90%] max-h-[90%] rounded-lg shadow-lg">
                   `;
                   document.body.appendChild(lightbox);
                   lightbox.addEventListener(
@@ -218,9 +216,9 @@ const Chatbot = ({ userId }: ChatbotProps) => {
               />
             </div>
           </div>
-          <p className="text-xs text-gray-500">Click to enlarge</p>
+          <p className="text-xs text-gray-500 mt-1">Click to enlarge</p>
           <button
-            className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            className="mt-3 px-5 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full hover:from-green-600 hover:to-teal-600 transition-all duration-300 shadow-md"
             onClick={() => {
               console.log("Buy button clicked for event:", event._id);
               handleCheckout(event);
@@ -239,6 +237,7 @@ const Chatbot = ({ userId }: ChatbotProps) => {
     showTypingIndicator();
     const events = await fetchAllEvents();
     hideTypingIndicator();
+    
     if (events && events.length > 0) {
       events.forEach((event: any) => displayEventDetails(event));
       const filteredOptions = initialSuggestedQuestions.filter(
@@ -252,8 +251,9 @@ const Chatbot = ({ userId }: ChatbotProps) => {
     } else {
       addMessage(
         "bot",
-        "No events were found, or an error occurred during retrieval. Please ensure events are available in the database."
+        "No events were found. Please check if events are available in the database or try again later."
       );
+      addQuickOptions(initialSuggestedQuestions);
     }
   };
 
@@ -265,16 +265,12 @@ const Chatbot = ({ userId }: ChatbotProps) => {
     );
     const eventSpecificOptions = [
       {
-        display: `Show sentiment analysis for ${eventName}`,
-        action: `show sentiment analysis for ${eventName.toLowerCase()}`,
-      },
-      {
         display: `Summarize ${eventName}`,
         action: `summarize ${eventName.toLowerCase()}`,
       },
       {
-        display: `Generate a poster for ${eventName}`,
-        action: `generate a poster for ${eventName.toLowerCase()}`,
+        display: `Provide event highlights for ${eventName}`,
+        action: `provide event highlights for ${eventName.toLowerCase()}`,
       },
     ];
     addQuickOptions(eventSpecificOptions);
@@ -366,6 +362,29 @@ const Chatbot = ({ userId }: ChatbotProps) => {
     }
   };
 
+  const processCustomEventQuery = async (query: string) => {
+    showGeminiLoading();
+    const events = await fetchAllEvents();
+    if (events && events.length > 0) {
+      const eventData = events.map((event: any) => ({
+        title: event.title,
+        price: event.isFree ? "Free" : event.price || "Not specified",
+        description: event.description || "No description available",
+        date: `${new Date(event.startDateTime).toLocaleString()} - ${new Date(event.endDateTime).toLocaleString()}`,
+      }));
+      const prompt = `Here is a list of events: ${JSON.stringify(eventData)}. Based on this data, answer the following query: "${query}"`;
+      const response = await fetchGeminiResponse(prompt);
+      hideGeminiLoading();
+      addMessage("bot", response);
+    } else {
+      hideGeminiLoading();
+      addMessage(
+        "bot",
+        "No events were found to process your query. Please try 'Display all events' to check available events."
+      );
+    }
+  };
+
   const resetChat = () => {
     setMessages([]);
     setSelectedEvent(null);
@@ -384,9 +403,9 @@ const Chatbot = ({ userId }: ChatbotProps) => {
     }
 
     if (
-      normalizedMessage.includes("display") &&
-      normalizedMessage.includes("all") &&
-      normalizedMessage.includes("events")
+      normalizedMessage === "display all events" ||
+      normalizedMessage === "show all events" ||
+      normalizedMessage === "list all events"
     ) {
       await processAllEventsRequest();
       return;
@@ -410,95 +429,21 @@ const Chatbot = ({ userId }: ChatbotProps) => {
       return;
     }
 
-    if (
-      normalizedMessage.startsWith("what is the price of") ||
-      normalizedMessage.startsWith("price of")
-    ) {
-      const eventNameMatch = normalizedMessage.match(
-        /(?:what is the price of|price of)\s+(.+)/
-      );
-      if (eventNameMatch && eventNameMatch[1]) {
-        const eventName = eventNameMatch[1].trim();
-        const events = await fetchEventDetails(eventName);
-        if (events && events.length > 0) {
-          const event = events[0];
-          const price = event.isFree ? "Free" : event.price || "Not specified";
-          addMessage("bot", `The price of "${eventName}" is ${price}.`);
-        } else {
-          addMessage(
-            "bot",
-            `The event "${eventName}" could not be found. Please check the event name or use 'Display all events' to see available options.`
-          );
-        }
-        return;
+    if (normalizedMessage.includes("provide event highlights")) {
+      const eventName = message.split("for")[1]?.trim();
+      if (eventName) {
+        await processEventHighlightsRequest(eventName);
+      } else {
+        setAwaitingEventName(true);
+        addMessage("bot", knowledgeBase["event highlights"]);
       }
+      return;
     }
 
-    if (normalizedMessage.startsWith("location of")) {
-      const eventNameMatch = normalizedMessage.match(/location of\s+(.+)/);
-      if (eventNameMatch && eventNameMatch[1]) {
-        const eventName = eventNameMatch[1].trim();
-        const events = await fetchEventDetails(eventName);
-        if (events && events.length > 0) {
-          const event = events[0];
-          const location = event.location || "Not specified";
-          addMessage("bot", `The location of "${eventName}" is ${location}.`);
-        } else {
-          addMessage(
-            "bot",
-            `The event "${eventName}" could not be found. Please check the event name or use 'Display all events' to see available options.`
-          );
-        }
-        return;
-      }
-    }
-
-    if (
-      normalizedMessage.match(
-        /(description|details|highlights|organizer|category|date) of\s+(.+)/
-      )
-    ) {
-      const match = normalizedMessage.match(
-        /(description|details|highlights|organizer|category|date) of\s+(.+)/
-      );
-      if (match && match[2]) {
-        const queryType = match[1];
-        const eventName = match[2].trim();
-        const events = await fetchEventDetails(eventName);
-        if (events && events.length > 0) {
-          const event = events[0];
-          showGeminiLoading();
-          const prompt = `Based on the following event data: Title: ${
-            event.title
-          }, Description: ${event.description || "None"}, Date: ${new Date(
-            event.startDateTime
-          ).toLocaleString()} - ${new Date(
-            event.endDateTime
-          ).toLocaleString()}, Location: ${
-            event.location || "Not specified"
-          }, Price: ${
-            event.isFree ? "Free" : event.price || "Not specified"
-          }, Organizer: ${
-            event.organizer
-              ? `${event.organizer.firstName} ${event.organizer.lastName}`
-              : "Not specified"
-          }, Category: ${
-            event.category?.name || "Not specified"
-          }, provide a concise ${queryType} for the event "${eventName}".`;
-          const response = await fetchGeminiResponse(prompt);
-          hideGeminiLoading();
-          addMessage(
-            "bot",
-            `${
-              queryType.charAt(0).toUpperCase() + queryType.slice(1)
-            } of "${eventName}": ${response}`
-          );
-        } else {
-          addMessage(
-            "bot",
-            `The event "${eventName}" could not be found. Please check the event name or use 'Display all events' to see available options.`
-          );
-        }
+    if (normalizedMessage.includes("summarize")) {
+      const eventName = message.split("summarize")[1]?.trim();
+      if (eventName) {
+        await processSummarizeRequest(eventName);
         return;
       }
     }
@@ -506,15 +451,12 @@ const Chatbot = ({ userId }: ChatbotProps) => {
     if (selectedEvent) {
       const eventLower = selectedEvent.toLowerCase();
       const expectedSummarize = `summarize ${eventLower}`;
-      const expectedSentiment = `show sentiment analysis for ${eventLower}`;
-      const expectedPoster = `generate a poster for ${eventLower}`;
+      const expectedHighlights = `provide event highlights for ${eventLower}`;
 
-      if (normalizedMessage === expectedSentiment) {
-        await processSentimentRequest(selectedEvent);
-      } else if (normalizedMessage === expectedSummarize) {
+      if (normalizedMessage === expectedSummarize) {
         await processSummarizeRequest(selectedEvent);
-      } else if (normalizedMessage === expectedPoster) {
-        await processPosterRequest(selectedEvent);
+      } else if (normalizedMessage === expectedHighlights) {
+        await processEventHighlightsRequest(selectedEvent);
       } else {
         addMessage(
           "bot",
@@ -522,16 +464,12 @@ const Chatbot = ({ userId }: ChatbotProps) => {
         );
         const eventSpecificOptions = [
           {
-            display: `Show sentiment analysis for ${selectedEvent}`,
-            action: `show sentiment analysis for ${eventLower}`,
-          },
-          {
             display: `Summarize ${selectedEvent}`,
             action: `summarize ${eventLower}`,
           },
           {
-            display: `Generate a poster for ${selectedEvent}`,
-            action: `generate a poster for ${eventLower}`,
+            display: `Provide event highlights for ${selectedEvent}`,
+            action: `provide event highlights for ${eventLower}`,
           },
         ];
         addQuickOptions(eventSpecificOptions);
@@ -548,60 +486,17 @@ const Chatbot = ({ userId }: ChatbotProps) => {
       }
     }
 
-    if (normalizedMessage.includes("event highlights")) {
-      setAwaitingEventName(true);
-      addMessage("bot", knowledgeBase["event highlights"]);
-      return;
-    }
-
-    if (normalizedMessage.includes("summarize")) {
-      const eventName = message.split("summarize")[1]?.trim();
-      if (eventName) {
-        await processSummarizeRequest(eventName);
-        return;
-      }
-    }
-
-    if (
-      normalizedMessage.includes("analyze sentiment") ||
-      normalizedMessage.includes("perform sentiment analysis")
-    ) {
-      const eventName = message.split("for")[1]?.trim();
-      if (eventName) {
-        await processSentimentRequest(eventName);
-        return;
-      } else {
-        addMessage(
-          "bot",
-          "Please specify an event name after 'analyze sentiment for' (e.g., 'Analyze sentiment for Mumbai Hackathon')."
-        );
-      }
-      return;
-    }
-
-    if (
-      normalizedMessage.includes("design a poster") ||
-      normalizedMessage.includes("generate a poster")
-    ) {
-      const eventName = message.split("for")[1]?.trim();
-      if (eventName) {
-        await processPosterRequest(eventName);
-        return;
-      } else {
-        addMessage(
-          "bot",
-          "Please specify an event name after 'generate a poster for' (e.g., 'Generate a poster for Mumbai Hackathon')."
-        );
-      }
-      return;
-    }
-
     let response = null;
     for (const [key, value] of Object.entries(knowledgeBase)) {
       if (normalizedMessage.includes(key)) {
         response = value;
         break;
       }
+    }
+
+    if (!response && (normalizedMessage.includes("event") || normalizedMessage.includes("events"))) {
+      await processCustomEventQuery(message);
+      return;
     }
 
     response =
@@ -648,13 +543,13 @@ const Chatbot = ({ userId }: ChatbotProps) => {
     <>
       {!isOpen && (
         <div
-          className="fixed bottom-5 right-5 bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center cursor-pointer z-50 hover:bg-blue-600 transition-colors"
+          className="fixed bottom-6 right-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full w-14 h-14 flex items-center justify-center cursor-pointer z-50 hover:shadow-lg hover:scale-105 transition-all duration-300"
           onClick={() => setIsOpen(true)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
+            width="28"
+            height="28"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -667,43 +562,45 @@ const Chatbot = ({ userId }: ChatbotProps) => {
         </div>
       )}
       {isOpen && (
-        <div className="fixed bottom-20 right-5 w-80 h-[500px] bg-white rounded-lg shadow-lg z-50 flex flex-col">
-          <div className="bg-blue-500 text-white p-3 rounded-t-lg flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Event Analytics Assistant</h3>
-            <div className="flex items-center gap-2">
+        <div className="fixed bottom-20 right-6 w-96 h-[625px] bg-white rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden border border-gray-100">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-t-xl flex justify-between items-center">
+            <h3 className="text-xl font-bold tracking-tight">
+              Event Analytics Assistant
+            </h3>
+            <div className="flex items-center gap-3">
               <button
-                className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                className="px-3 py-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-300 shadow-sm text-sm font-medium"
                 onClick={resetChat}
               >
                 Restart
               </button>
               <button
-                className="text-white text-xl w-6 h-6 flex items-center justify-center hover:text-gray-200"
+                className="text-white text-2xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-all duration-300"
                 onClick={() => setIsOpen(false)}
               >
                 −
               </button>
             </div>
           </div>
-          <div className="flex-1 p-3 overflow-y-auto">
+          <div className="flex-1 p-4 overflow-y-auto bg-gradient-to-b from-gray-50 to-white">
             {messages.map((msg, index) => (
-              <div key={index} className="mb-2">
+              <div key={index} className="mb-3">
                 {msg.isRich && typeof msg.content !== "string" ? (
                   <div
-                    className={`p-2 rounded-lg max-w-[80%] ${
+                    className={`p-3 rounded-lg max-w-[85%] shadow-md ${
                       msg.type === "user"
-                        ? "bg-blue-500 text-white ml-auto"
-                        : "bg-gray-100 text-black"
+                        ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white ml-auto"
+                        : "bg-white text-gray-800 border border-gray-200"
                     }`}
                   >
                     {msg.content}
                   </div>
                 ) : (
                   <div
-                    className={`p-2 rounded-lg max-w-[80%] ${
+                    className={`p-3 rounded-lg max-w-[85%] shadow-md ${
                       msg.type === "user"
-                        ? "bg-blue-500 text-white ml-auto"
-                        : "bg-gray-100 text-black"
+                        ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white ml-auto"
+                        : "bg-white text-gray-800 border border-gray-200"
                     }`}
                     dangerouslySetInnerHTML={{
                       __html:
@@ -715,41 +612,41 @@ const Chatbot = ({ userId }: ChatbotProps) => {
             ))}
             {isGeminiLoading && (
               <div className="flex justify-center items-center gap-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full animate-ping"></div>
-                <div className="w-3 h-3 bg-blue-500 rounded-full animate-ping delay-200"></div>
-                <div className="w-3 h-3 bg-blue-500 rounded-full animate-ping delay-400"></div>
+                <div className="w-3 h-3 bg-indigo-500 rounded-full animate-ping"></div>
+                <div className="w-3 h-3 bg-indigo-500 rounded-full animate-ping delay-200"></div>
+                <div className="w-3 h-3 bg-indigo-500 rounded-full animate-ping delay-400"></div>
               </div>
             )}
             {isTyping && !isGeminiLoading && (
               <div className="flex gap-1">
                 <span
-                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"
                   style={{ animationDelay: "0s" }}
                 ></span>
                 <span
-                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"
                   style={{ animationDelay: "0.2s" }}
                 ></span>
                 <span
-                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"
                   style={{ animationDelay: "0.4s" }}
                 ></span>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
-          <div className="flex p-3 border-t border-gray-200">
+          <div className="flex p-4 border-t border-gray-200 bg-white">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSend()}
               placeholder="Type your message here..."
-              className="flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 p-3 border border-gray-200 rounded-l-full focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 text-gray-800 placeholder-gray-400 transition-all duration-300"
             />
             <button
               onClick={handleSend}
-              className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600"
+              className="px-5 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-r-full hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 shadow-md"
             >
               Send
             </button>
