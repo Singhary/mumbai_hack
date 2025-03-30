@@ -237,7 +237,7 @@ const Chatbot = ({ userId }: ChatbotProps) => {
     showTypingIndicator();
     const events = await fetchAllEvents();
     hideTypingIndicator();
-    
+
     if (events && events.length > 0) {
       events.forEach((event: any) => displayEventDetails(event));
       const filteredOptions = initialSuggestedQuestions.filter(
@@ -370,9 +370,13 @@ const Chatbot = ({ userId }: ChatbotProps) => {
         title: event.title,
         price: event.isFree ? "Free" : event.price || "Not specified",
         description: event.description || "No description available",
-        date: `${new Date(event.startDateTime).toLocaleString()} - ${new Date(event.endDateTime).toLocaleString()}`,
+        date: `${new Date(event.startDateTime).toLocaleString()} - ${new Date(
+          event.endDateTime
+        ).toLocaleString()}`,
       }));
-      const prompt = `Here is a list of events: ${JSON.stringify(eventData)}. Based on this data, answer the following query: "${query}"`;
+      const prompt = `Here is a list of events: ${JSON.stringify(
+        eventData
+      )}. Based on this data, answer the following query: "${query}"`;
       const response = await fetchGeminiResponse(prompt);
       hideGeminiLoading();
       addMessage("bot", response);
@@ -494,7 +498,11 @@ const Chatbot = ({ userId }: ChatbotProps) => {
       }
     }
 
-    if (!response && (normalizedMessage.includes("event") || normalizedMessage.includes("events"))) {
+    if (
+      !response &&
+      (normalizedMessage.includes("event") ||
+        normalizedMessage.includes("events"))
+    ) {
       await processCustomEventQuery(message);
       return;
     }
@@ -543,7 +551,7 @@ const Chatbot = ({ userId }: ChatbotProps) => {
     <>
       {!isOpen && (
         <div
-          className="fixed bottom-6 right-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full w-14 h-14 flex items-center justify-center cursor-pointer z-50 hover:shadow-lg hover:scale-105 transition-all duration-300"
+          className="fixed bottom-6 right-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full w-14 h-14 flex items-center justify-center cursor-pointer z-50 hover:shadow-lg hover:scale-105 transition-all animate-bounce"
           onClick={() => setIsOpen(true)}
         >
           <svg
